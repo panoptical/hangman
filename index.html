@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to Hangman!</title>
+<script type="text/javascript" src="wordlist.js"></script>
+<script>
+
+
+/*
+
+JS Hangman
+
+pseudo:
+
+
+initdisplay(string)
+ for c in string
+  display[cur] = '_'
+ output display
+
+updatedisplay(char)
+ for c in string
+  if char = c
+  display[cur] = char
+ output display
+
+
+initdisplay()
+
+for i = 0 to maxguesses
+
+get guess
+
+if guess is in string
+ rewrite string with guesses shown
+
+else
+ i++
+
+
+
+
+check letters:
+ - 26 buttons
+ - or 1 text box + validation
+ 
+ 
+ 
+ get new word:
+ 
+ js file that is just a var wordlist declaration?
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+*///
+
+
+//globals:
+var guesscounter = 0;
+var word = new Array();
+var display = new Array();
+var guessedletters = "";
+var lost=false;
+
+var scale=2;
+
+
+function get_new_word()
+{
+	index = Math.floor((Math.random()*cities.length));
+	word = cities[index];
+}
+
+
+
+function clearCanvas(c)
+{
+	c.width=c.width;
+}
+
+
+function resetLetters()
+{
+	for (var i = 0; i<guessedletters.length; i++)
+	{
+//works		document.getElementById("a").style=.background-color:red";
+		document.getElementById(guessedletters.charAt(i)).style.backgroundColor="initial";
+	}
+}
+
+
+function newgame()
+{
+guesscounter=0;
+resetLetters();
+guessedletters = "";
+lost=false;
+//document.getElementById("used_letters").innerHTML="";
+document.getElementById("result").innerHTML="";
+get_new_word();
+initdisplay();
+
+var c=document.getElementById("myCanvas");
+clearCanvas(c);
+
+drawhangman();
+}
+
+
+
+
+function drawhangman()
+{
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+ctx.lineWidth=3;
+ctx.beginPath();
+switch(guesscounter)
+{
+case 0:
+//gallows base
+ctx.moveTo(20*scale,230*scale);
+ctx.lineTo(160*scale,230*scale);
+//gallows post
+ctx.moveTo(40*scale,230*scale);
+ctx.lineTo(40*scale,20*scale);
+//gallows top beam
+ctx.lineTo(100*scale, 20*scale);
+//noose
+ctx.lineTo(100*scale, 40*scale);
+break;
+
+case 1:
+//head
+ctx.arc(100*scale,60*scale,20*scale,0,2*Math.PI);
+break;
+
+case 2:
+//torso
+ctx.moveTo(100*scale, 80*scale);
+ctx.lineTo(100*scale,130*scale);
+break;
+
+case 3:
+//left arm
+ctx.moveTo(100*scale,100*scale);
+ctx.lineTo(65*scale,80*scale);
+break;
+
+case 4:
+//right arm
+ctx.moveTo(100*scale,100*scale);
+ctx.lineTo(135*scale,80*scale);
+break;
+
+case 5:
+//left leg
+ctx.moveTo(100*scale,130*scale);
+ctx.lineTo(70*scale,165*scale);
+break;
+
+case 6:
+//right leg
+ctx.moveTo(100*scale,130*scale);
+ctx.lineTo(130*scale,165*scale);
+break;
+
+case 7:
+//face
+//left eye
+ctx.moveTo(90*scale, 50*scale);
+ctx.lineTo(95*scale, 55*scale);
+ctx.moveTo(95*scale, 50*scale);
+ctx.lineTo(90*scale, 55*scale);
+//right eye
+ctx.moveTo(110*scale, 50*scale);
+ctx.lineTo(105*scale, 55*scale);
+ctx.moveTo(105*scale, 50*scale);
+ctx.lineTo(110*scale, 55*scale);
+//mouth (line)
+ctx.moveTo(92*scale, 72*scale);
+ctx.lineTo(108*scale, 72*scale);
+break;
+}
+ctx.stroke();
+}
+
+function initdisplay()
+{
+	display=new Array();
+	for (var i=0; i<word.length; i++)
+	{
+		display[i] = '_';
+		if (word[i]==' ')
+		{
+			display[i] = ' ';
+		}
+	}
+	document.getElementById("word").innerHTML = display.join("");
+}
+
+
+function updatedisplay(letter)
+{
+	document.getElementById("hangman").innerHTML += letter;
+
+}
+
+function lose()
+{
+	document.getElementById("result").innerHTML="Sorry, You Lose!";
+	lost=true;
+}
+
+function win()
+{
+	if (!lost)
+	{
+		document.getElementById("result").innerHTML="Hooray, You Win!";
+	}
+}
+
+function wronganswer(letter)
+{
+	guesscounter++;
+	drawhangman();
+	//document.getElementById("used_letters").innerHTML+=" " + letter;
+	if (guesscounter == 7)
+	{
+		lose();
+	}
+}
+
+
+function guess(letter)
+{
+	if (guessedletters.indexOf(letter)==-1)
+	{
+		guessedletters+=letter;
+		document.getElementById(letter).style="background-color:blue";
+		var hit = false;
+		var blanks = false;
+		//code to check if the letter has been used
+		//also check if there are no blanks left
+		for (var i=0; i<word.length; i++)
+		{
+		
+			//alert(word[i]);
+			if (word[i] == letter)
+			{
+				display[i] = letter;
+				hit = true;
+			}	
+			if (display[i] == "_")
+			{
+				blanks = true;
+			}
+		}
+		document.getElementById("word").innerHTML = display.join("");
+
+		//check victory
+		if (!blanks)
+		{
+			win();
+		}
+	
+		//if the letter was not in the word, do the wrong answer procedure
+		if (!hit)
+		{
+			wronganswer(letter);
+		}
+	}
+}
+
+
+
+//Writes the HTML Document:
+
+//write the canvas
+var width = 180*scale;
+var height = 250*scale;
+document.write("<canvas id=\"myCanvas\" width=\"" + width + "\" height=\"" + height + "\" >Your browser does not support the HTML5 canvas tag.</canvas>");
+
+//write a layout div
+document.write("<div id=\"main\">");
+
+//write the title
+document.write("<h1 id=\"hangman\">Hangman</h1>");
+
+
+
+//write the word
+document.write("<span id=\"word\"></span><br><br>");
+
+document.write("<p><span id=\"result\"></span></p>");
+
+document.write("<p>Used Letters: <span id=\"used_letters\"></span></p>");
+
+
+function numberToLetter(n)
+{
+	return String.fromCharCode(96 + n);
+}
+
+function writeLetter(l)
+{
+ 	document.write("<img id=\"" + l + "\" src=\"Letter-" + l + "-icon.png\" onclick=\"guess(\'" + c + "\');\">");
+}
+
+//write the letters
+for (var i=1; i<=26; i++)
+{
+	var c = numberToLetter(i);
+	writeLetter(c);
+	if (i==7 || i==14 || i==21)
+	{
+		document.write("<br>");
+	}
+}
+
+
+document.write("<br><br><input type=\"button\" value=\"New Game\" onclick=\"newgame()\"><br><br><br>")
+
+//end the layout div
+document.write("</div>");
+
+
+newgame();
+
+</script>
+
+<style>
+
+#main
+{
+margin-left:100px;
+width:310px;
+background-color:lightblue;
+padding-left:20px;
+padding-right:10px;
+padding-top:10px;
+}
+
+img
+{
+height:35px;
+width:35px;
+margin:3px;
+//background-color:blue;
+
+}
+
+#word
+{
+margin-left:15px;
+letter-spacing:3px;
+font-size: 3em;
+font-family: "Lucida Console", Monaco, monospace;
+color:darkblue;
+}
+
+h1
+{
+margin-left:15px;
+position:relative;
+top:-20px;
+letter-spacing:3px;
+font-size: 3em;
+font-family: arial; sans-serif;
+color:darkgreen;
+}
+
+#myCanvas
+{
+position:absolute;
+left: 550px;
+top: 50px;
+background-color:#FFB299;
+}
+
+p
+{
+margin-left: 15px;
+font-family: arial; sans-serif;
+letter-spacing:1px;
+}
+
+input
+{
+margin-left: 15px;
+font-size:1.5em;
+}
+
+body
+{
+background-color:lightgreen;
+}
+
+#result
+{
+font-size:2em;
+color:red;
+}
+
+</style>
+
+
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
