@@ -244,7 +244,8 @@ function guess(letter)
 	if (guessedletters.indexOf(letter)==-1)
 	{
 		guessedletters+=letter;
-		document.getElementById(letter).style="background-color:blue";
+//		document.getElementById(letter).style="background-color:blue";
+		document.getElementById(letter).style.backgroundColor="blue";
 		var hit = false;
 		var blanks = false;
 		//code to check if the letter has been used
